@@ -1,18 +1,36 @@
-import { sql } from "drizzle-orm";
-import { pgTable, text, varchar } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+// Verification request schema
+export const verificationRequestSchema = z.object({
+  text: z.string().min(1, "Text is required"),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
+export type VerificationRequest = z.infer<typeof verificationRequestSchema>;
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+// Verification result types
+export type VerificationStatus = "verified" | "partial" | "failed";
+
+export interface ClaimVerification {
+  claim: string;
+  sourceUrl: string;
+  status: VerificationStatus;
+  confidence: number;
+  explanation: string;
+  sourceExcerpt?: string;
+}
+
+export interface VerificationResponse {
+  verifications: ClaimVerification[];
+  summary: {
+    totalClaims: number;
+    verified: number;
+    partial: number;
+    failed: number;
+  };
+}
+
+// Extracted claim with source
+export interface ExtractedClaim {
+  claim: string;
+  sourceUrl: string;
+}

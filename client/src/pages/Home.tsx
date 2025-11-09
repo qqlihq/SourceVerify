@@ -1,73 +1,38 @@
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import VerificationInput from "@/components/VerificationInput";
 import VerificationResults from "@/components/VerificationResults";
 import VerificationCard from "@/components/VerificationCard";
 import { Button } from "@/components/ui/button";
-import { RotateCcw } from "lucide-react";
-
-//todo: remove mock functionality - this is just for prototype demo
-const mockVerificationData = [
-  {
-    claim: "The global temperature has increased by 1.1°C since pre-industrial times",
-    sourceUrl: "https://climate.nasa.gov/vital-signs/global-temperature/",
-    status: "verified" as const,
-    confidence: 95,
-    explanation: "The source directly states that global average surface temperature has risen about 1.1°C since the late 19th century, which matches the claim exactly.",
-    sourceExcerpt: "The planet's average surface temperature has risen about 1.1 degrees Celsius (2 degrees Fahrenheit) since the late 19th century...",
-  },
-  {
-    claim: "Amazon rainforest covers 5.5 million square kilometers",
-    sourceUrl: "https://www.worldwildlife.org/places/amazon",
-    status: "partial" as const,
-    confidence: 67,
-    explanation: "The source mentions the Amazon spans approximately 6.7 million square kilometers, which differs from the claimed 5.5 million. The claim may be referring to forest area specifically.",
-    sourceExcerpt: "The Amazon spans 6.7 million square kilometers across nine countries...",
-  },
-  {
-    claim: "Over 80% of ocean plastic comes from land-based sources",
-    sourceUrl: "https://oceanconservancy.org/trash-free-seas/plastics-in-the-ocean/",
-    status: "verified" as const,
-    confidence: 92,
-    explanation: "The source confirms that the majority of ocean plastic pollution originates from land-based sources, supporting this claim.",
-    sourceExcerpt: "An estimated 80 percent of ocean plastic comes from land-based sources...",
-  },
-  {
-    claim: "Mars has three moons orbiting it",
-    sourceUrl: "https://science.nasa.gov/mars/",
-    status: "failed" as const,
-    confidence: 15,
-    explanation: "The source clearly states Mars has two moons (Phobos and Deimos), not three. This claim is contradicted by the source.",
-    sourceExcerpt: "Mars has two small moons, Phobos and Deimos, that may be captured asteroids.",
-  },
-];
+import { RotateCcw, AlertCircle } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import type { VerificationResponse } from "@shared/schema";
 
 export default function Home() {
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [showResults, setShowResults] = useState(false);
+  const [verificationData, setVerificationData] = useState<VerificationResponse | null>(null);
+
+  const verifyMutation = useMutation({
+    mutationFn: async (text: string) => {
+      const response = await apiRequest<VerificationResponse>("POST", "/api/verify", { text });
+      return response;
+    },
+    onSuccess: (data) => {
+      setVerificationData(data);
+    },
+  });
 
   const handleVerify = (text: string) => {
     console.log("Starting verification for:", text);
-    setIsVerifying(true);
-    
-    //todo: remove mock functionality - simulate API call
-    setTimeout(() => {
-      setIsVerifying(false);
-      setShowResults(true);
-    }, 1500);
+    verifyMutation.mutate(text);
   };
 
   const handleReset = () => {
     console.log("Resetting verification");
-    setShowResults(false);
+    setVerificationData(null);
+    verifyMutation.reset();
   };
 
-  //todo: remove mock functionality - calculate from real data
-  const stats = {
-    totalClaims: mockVerificationData.length,
-    verified: mockVerificationData.filter(v => v.status === "verified").length,
-    partial: mockVerificationData.filter(v => v.status === "partial").length,
-    failed: mockVerificationData.filter(v => v.status === "failed").length,
-  };
+  const showResults = verificationData !== null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -94,21 +59,43 @@ export default function Home() {
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         {!showResults ? (
-          <div className="max-w-3xl mx-auto">
-            <VerificationInput onVerify={handleVerify} isLoading={isVerifying} />
+          <div className="max-w-3xl mx-auto space-y-4">
+            <VerificationInput onVerify={handleVerify} isLoading={verifyMutation.isPending} />
+            
+            {verifyMutation.isError && (
+              <div className="bg-error-light border border-error-border rounded-md p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-error flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <h4 className="font-semibold text-error">Verification Failed</h4>
+                  <p className="text-sm text-error mt-1">
+                    {verifyMutation.error instanceof Error 
+                      ? verifyMutation.error.message 
+                      : "An error occurred while verifying sources. Please try again."}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="space-y-6">
-            <VerificationResults {...stats} />
+            <VerificationResults {...verificationData.summary} />
             
-            <div>
-              <h2 className="text-xl font-semibold mb-4">Verification Details</h2>
-              <div className="space-y-4">
-                {mockVerificationData.map((verification, index) => (
-                  <VerificationCard key={index} {...verification} />
-                ))}
+            {verificationData.verifications.length > 0 ? (
+              <div>
+                <h2 className="text-xl font-semibold mb-4">Verification Details</h2>
+                <div className="space-y-4">
+                  {verificationData.verifications.map((verification, index) => (
+                    <VerificationCard key={index} {...verification} />
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">
+                  No claims with sources were found in the text. Make sure your input includes factual claims with cited source URLs.
+                </p>
+              </div>
+            )}
           </div>
         )}
       </main>
