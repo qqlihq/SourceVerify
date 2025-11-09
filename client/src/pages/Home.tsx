@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { Link } from "wouter";
 import VerificationInput from "@/components/VerificationInput";
 import VerificationResults from "@/components/VerificationResults";
 import VerificationCard from "@/components/VerificationCard";
@@ -108,9 +109,21 @@ export default function Home() {
       <footer className="border-t mt-12">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-            <a href="#" className="hover:text-foreground transition-colors">About</a>
-            <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
-            <a href="#" className="hover:text-foreground transition-colors">GitHub</a>
+            <Link href="/about">
+              <a className="hover:text-foreground transition-colors" data-testid="link-about">About</a>
+            </Link>
+            <Link href="/privacy">
+              <a className="hover:text-foreground transition-colors" data-testid="link-privacy">Privacy</a>
+            </Link>
+            <a 
+              href="https://github.com" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-foreground transition-colors"
+              data-testid="link-github"
+            >
+              GitHub
+            </a>
           </div>
         </div>
       </footer>
