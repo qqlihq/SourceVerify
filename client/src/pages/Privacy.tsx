@@ -183,7 +183,7 @@ export default function Privacy() {
               Privacy
             </Link>
             <a 
-              href="https://github.com" 
+              href="https://github.com/qqilihq/sourcecheck" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="hover:text-foreground transition-colors"
