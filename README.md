@@ -5,7 +5,7 @@ An AI-powered tool that verifies whether claims in AI-generated responses are ac
 ## 🚀 Quick Links
 
 - **Live Demo (Replit):** https://replit.com/@philipphamboeck/SourceVerify
-- **Source Code (GitHub):** https://github.com/qqilihq/SourceVerify
+- **Source Code (GitHub):** https://github.com/qqlihq/SourceVerify
 
 ## 📖 About
 
@@ -50,7 +50,7 @@ SourceVerify automates the verification process by:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/qqilihq/SourceVerify.git
+git clone https://github.com/qqlihq/SourceVerify.git
 cd SourceVerify
 ```
 
@@ -107,14 +107,14 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ## 📧 Contact
 
-Created by [@qqilihq](https://github.com/qqilihq)
+Created by [@qqlihq](https://github.com/qqlihq)
 
 ---
 
 ## 🎮 Try It Now
 
 ### Open in Replit
-[![Open in Replit](https://replit.com/badge/github/qqilihq/SourceVerify)](https://replit.com/@philipphamboeck/SourceVerify)
+[![Open in Replit](https://replit.com/badge/github/qqlihq/SourceVerify)](https://replit.com/@philipphamboeck/SourceVerify)
 
 ### Embed on Your Website
 ```html
