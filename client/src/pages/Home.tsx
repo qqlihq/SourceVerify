@@ -109,11 +109,11 @@ export default function Home() {
       <footer className="border-t mt-12">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-            <Link href="/about">
-              <a className="hover:text-foreground transition-colors" data-testid="link-about">About</a>
+            <Link href="/about" className="hover:text-foreground transition-colors" data-testid="link-about">
+              About
             </Link>
-            <Link href="/privacy">
-              <a className="hover:text-foreground transition-colors" data-testid="link-privacy">Privacy</a>
+            <Link href="/privacy" className="hover:text-foreground transition-colors" data-testid="link-privacy">
+              Privacy
             </Link>
             <a 
               href="https://github.com" 

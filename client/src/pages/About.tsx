@@ -9,16 +9,14 @@ export default function About() {
       <header className="border-b">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/">
-              <a className="flex items-center gap-2" data-testid="link-home">
-                <h1 className="text-2xl font-bold">SourceCheck</h1>
-              </a>
+            <Link href="/" className="flex items-center gap-2" data-testid="link-home">
+              <h1 className="text-2xl font-bold">SourceCheck</h1>
             </Link>
-            <Link href="/">
-              <Button variant="outline" data-testid="button-back-home">
+            <Button variant="outline" asChild>
+              <Link href="/" data-testid="button-back-home">
                 Back to Home
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </header>
@@ -179,11 +177,11 @@ export default function About() {
           </Card>
 
           <div className="text-center">
-            <Link href="/">
-              <Button size="lg" data-testid="button-try-now">
+            <Button size="lg" asChild>
+              <Link href="/" data-testid="button-try-now">
                 Try SourceCheck Now
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </main>
@@ -191,11 +189,11 @@ export default function About() {
       <footer className="border-t mt-12">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
-            <Link href="/about">
-              <a className="hover:text-foreground transition-colors" data-testid="link-about">About</a>
+            <Link href="/about" className="hover:text-foreground transition-colors" data-testid="link-about">
+              About
             </Link>
-            <Link href="/privacy">
-              <a className="hover:text-foreground transition-colors" data-testid="link-privacy">Privacy</a>
+            <Link href="/privacy" className="hover:text-foreground transition-colors" data-testid="link-privacy">
+              Privacy
             </Link>
             <a 
               href="https://github.com" 
