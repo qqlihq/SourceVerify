@@ -81,6 +81,24 @@ export default {
           busy: "rgb(239 68 68)",
           offline: "rgb(156 163 175)",
         },
+        success: {
+          DEFAULT: "hsl(142 76% 36%)",
+          foreground: "hsl(0 0% 100%)",
+          light: "hsl(142 76% 96%)",
+          border: "hsl(142 76% 86%)",
+        },
+        warning: {
+          DEFAULT: "hsl(38 92% 50%)",
+          foreground: "hsl(0 0% 100%)",
+          light: "hsl(38 92% 96%)",
+          border: "hsl(38 92% 86%)",
+        },
+        error: {
+          DEFAULT: "hsl(0 84% 60%)",
+          foreground: "hsl(0 0% 100%)",
+          light: "hsl(0 84% 96%)",
+          border: "hsl(0 84% 86%)",
+        },
       },
       fontFamily: {
         sans: ["var(--font-sans)"],
