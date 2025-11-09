@@ -13,8 +13,9 @@ export default function Home() {
 
   const verifyMutation = useMutation({
     mutationFn: async (text: string) => {
-      const response = await apiRequest<VerificationResponse>("POST", "/api/verify", { text });
-      return response;
+      const response = await apiRequest("POST", "/api/verify", { text });
+      const data = await response.json() as VerificationResponse;
+      return data;
     },
     onSuccess: (data) => {
       setVerificationData(data);
@@ -47,6 +48,7 @@ export default function Home() {
               <Button
                 variant="outline"
                 onClick={handleReset}
+                disabled={verifyMutation.isPending}
                 data-testid="button-new-verification"
               >
                 <RotateCcw className="w-4 h-4 mr-2" />
@@ -63,7 +65,10 @@ export default function Home() {
             <VerificationInput onVerify={handleVerify} isLoading={verifyMutation.isPending} />
             
             {verifyMutation.isError && (
-              <div className="bg-error-light border border-error-border rounded-md p-4 flex items-start gap-3">
+              <div 
+                className="bg-error-light border border-error-border rounded-md p-4 flex items-start gap-3"
+                data-testid="alert-error"
+              >
                 <AlertCircle className="w-5 h-5 text-error flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <h4 className="font-semibold text-error">Verification Failed</h4>
