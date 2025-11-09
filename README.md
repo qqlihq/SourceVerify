@@ -1,17 +1,17 @@
-# SourceCheck
+# SourceVerify
 
-An AI-powered tool that verifies whether claims in AI-generated responses are actually supported by their cited sources. SourceCheck helps you quickly identify AI hallucinations and misrepresented data by automatically checking factual claims against their original sources.
+An AI-powered tool that verifies whether claims in AI-generated responses are actually supported by their cited sources. SourceVerify helps you quickly identify AI hallucinations and misrepresented data by automatically checking factual claims against their original sources.
 
 ## 🚀 Quick Links
 
 - **Live Demo (Replit):** https://replit.com/@philipphamboeck/SourceVerify
-- **Source Code (GitHub):** https://github.com/qqilihq/sourcecheck
+- **Source Code (GitHub):** https://github.com/qqilihq/SourceVerify
 
 ## 📖 About
 
 AI language models sometimes produce responses that sound authoritative but contain inaccurate information—a phenomenon known as "hallucination." Even when AI systems cite sources, the claims they make may not actually be supported by those sources, or quantitative data may be misrepresented.
 
-SourceCheck automates the verification process by:
+SourceVerify automates the verification process by:
 1. **Extracting claims** from AI-generated text using AI analysis
 2. **Fetching source content** from cited URLs with security protections
 3. **Verifying accuracy** by comparing claims against actual source content
@@ -50,8 +50,8 @@ SourceCheck automates the verification process by:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/qqilihq/sourcecheck.git
-cd sourcecheck
+git clone https://github.com/qqilihq/SourceVerify.git
+cd SourceVerify
 ```
 
 2. Install dependencies:
@@ -114,7 +114,7 @@ Created by [@qqilihq](https://github.com/qqilihq)
 ## 🎮 Try It Now
 
 ### Open in Replit
-[![Open in Replit](https://replit.com/badge/github/qqilihq/sourcecheck)](https://replit.com/@philipphamboeck/SourceVerify)
+[![Open in Replit](https://replit.com/badge/github/qqilihq/SourceVerify)](https://replit.com/@philipphamboeck/SourceVerify)
 
 ### Embed on Your Website
 ```html

@@ -10,7 +10,7 @@ export default function About() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2" data-testid="link-home">
-              <h1 className="text-2xl font-bold">SourceCheck</h1>
+              <h1 className="text-2xl font-bold">SourceVerify</h1>
             </Link>
             <Button variant="outline" asChild>
               <Link href="/" data-testid="button-back-home">
@@ -24,7 +24,7 @@ export default function About() {
       <main className="max-w-4xl mx-auto px-6 py-12">
         <div className="space-y-8">
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold">About SourceCheck</h1>
+            <h1 className="text-4xl font-bold">About SourceVerify</h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               An AI-powered tool that verifies whether claims in AI-generated responses are actually supported by their cited sources.
             </p>
@@ -39,7 +39,7 @@ export default function About() {
                 AI language models sometimes produce responses that sound authoritative but contain inaccurate information—a phenomenon known as "hallucination." Even when AI systems cite sources, the claims they make may not actually be supported by those sources, or quantitative data may be misrepresented.
               </p>
               <p>
-                Manually checking each claim against its source is time-consuming and tedious. SourceCheck automates this verification process, helping you quickly identify which claims are truly backed by evidence.
+                Manually checking each claim against its source is time-consuming and tedious. SourceVerify automates this verification process, helping you quickly identify which claims are truly backed by evidence.
               </p>
             </CardContent>
           </Card>
@@ -179,7 +179,7 @@ export default function About() {
           <div className="text-center">
             <Button size="lg" asChild>
               <Link href="/" data-testid="button-try-now">
-                Try SourceCheck Now
+                Try SourceVerify Now
               </Link>
             </Button>
           </div>
@@ -196,7 +196,7 @@ export default function About() {
               Privacy
             </Link>
             <a 
-              href="https://github.com/qqilihq/sourcecheck" 
+              href="https://github.com/qqilihq/SourceVerify" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="hover:text-foreground transition-colors"

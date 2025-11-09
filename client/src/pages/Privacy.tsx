@@ -9,7 +9,7 @@ export default function Privacy() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2" data-testid="link-home">
-              <h1 className="text-2xl font-bold">SourceCheck</h1>
+              <h1 className="text-2xl font-bold">SourceVerify</h1>
             </Link>
             <Button variant="outline" asChild>
               <Link href="/" data-testid="button-back-home">
@@ -130,7 +130,7 @@ export default function Privacy() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p>
-                Since SourceCheck does not permanently store personal data or create user accounts, there is no persistent data to access, modify, or delete. Each verification session is independent and temporary.
+                Since SourceVerify does not permanently store personal data or create user accounts, there is no persistent data to access, modify, or delete. Each verification session is independent and temporary.
               </p>
               <p>
                 If you have concerns about data that may have been logged for technical purposes, please contact us.
@@ -144,7 +144,7 @@ export default function Privacy() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p>
-                SourceCheck does not use cookies for tracking or analytics. Any session cookies used are strictly for technical functionality and are deleted when you close your browser.
+                SourceVerify does not use cookies for tracking or analytics. Any session cookies used are strictly for technical functionality and are deleted when you close your browser.
               </p>
             </CardContent>
           </Card>
@@ -183,7 +183,7 @@ export default function Privacy() {
               Privacy
             </Link>
             <a 
-              href="https://github.com/qqilihq/sourcecheck" 
+              href="https://github.com/qqilihq/SourceVerify" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="hover:text-foreground transition-colors"

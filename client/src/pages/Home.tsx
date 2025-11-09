@@ -42,7 +42,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold">SourceCheck</h1>
+              <h1 className="text-2xl font-bold">SourceVerify</h1>
               <p className="text-sm text-muted-foreground">AI Source Verification Tool</p>
             </div>
             {showResults && (
@@ -116,7 +116,7 @@ export default function Home() {
               Privacy
             </Link>
             <a 
-              href="https://github.com/qqilihq/sourcecheck" 
+              href="https://github.com/qqilihq/SourceVerify" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="hover:text-foreground transition-colors"

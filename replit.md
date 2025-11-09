@@ -1,10 +1,10 @@
-# SourceCheck - AI Source Verification Tool
+# SourceVerify - AI Source Verification Tool
 
 ## Overview
-SourceCheck is a web application that helps verify factual claims in AI-generated responses by automatically checking cited sources. It addresses the common problem of AI hallucinations and misattributed quantitative data.
+SourceVerify is a web application that helps verify factual claims in AI-generated responses by automatically checking cited sources. It addresses the common problem of AI hallucinations and misattributed quantitative data.
 
 ## Purpose
-Users can paste AI-generated text with source citations, and SourceCheck will:
+Users can paste AI-generated text with source citations, and SourceVerify will:
 1. Extract claims and their associated source URLs using AI
 2. Fetch the actual content from cited sources
 3. Use AI to verify whether each claim is actually supported by its source
