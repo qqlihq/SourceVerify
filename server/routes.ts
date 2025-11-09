@@ -4,6 +4,7 @@ import { verificationRequestSchema, type VerificationResponse } from "@shared/sc
 import { extractClaims } from "./lib/claimExtractor";
 import { fetchMultipleSources } from "./lib/scraper";
 import { verifyClaim } from "./lib/verifier";
+import { suggestAlternativeSources } from "./lib/sourceSuggester";
 import pLimit from "p-limit";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -69,18 +70,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const verifications = await Promise.all(verificationPromises);
 
+      // Step 4: Generate source suggestions for each verification
+      console.log("Generating alternative source suggestions...");
+      const suggestionLimit = pLimit(2); // Process 2 suggestion requests concurrently
+      
+      const verificationsWithSuggestions = await Promise.all(
+        verifications.map(verification =>
+          suggestionLimit(async () => {
+            // Only suggest sources for claims that need them (partial or failed)
+            // Also suggest for verified claims with lower confidence
+            const needsSuggestions = 
+              verification.status === "failed" ||
+              verification.status === "partial" ||
+              (verification.status === "verified" && verification.confidence < 90);
+            
+            if (needsSuggestions) {
+              const suggestions = await suggestAlternativeSources(
+                verification.claim,
+                verification.status,
+                verification.confidence
+              );
+              return { ...verification, suggestedSources: suggestions };
+            }
+            return verification;
+          })
+        )
+      );
+
       // Calculate summary statistics
       const summary = {
-        totalClaims: verifications.length,
-        verified: verifications.filter(v => v.status === "verified").length,
-        partial: verifications.filter(v => v.status === "partial").length,
-        failed: verifications.filter(v => v.status === "failed").length,
+        totalClaims: verificationsWithSuggestions.length,
+        verified: verificationsWithSuggestions.filter(v => v.status === "verified").length,
+        partial: verificationsWithSuggestions.filter(v => v.status === "partial").length,
+        failed: verificationsWithSuggestions.filter(v => v.status === "failed").length,
       };
 
       console.log(`Verification complete: ${summary.verified} verified, ${summary.partial} partial, ${summary.failed} failed`);
 
       const response: VerificationResponse = {
-        verifications,
+        verifications: verificationsWithSuggestions,
         summary,
       };
 

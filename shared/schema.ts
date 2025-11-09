@@ -10,6 +10,13 @@ export type VerificationRequest = z.infer<typeof verificationRequestSchema>;
 // Verification result types
 export type VerificationStatus = "verified" | "partial" | "failed";
 
+export interface SourceSuggestion {
+  name: string;
+  url?: string;
+  description: string;
+  searchQuery?: string;
+}
+
 export interface ClaimVerification {
   claim: string;
   sourceUrl: string;
@@ -17,6 +24,7 @@ export interface ClaimVerification {
   confidence: number;
   explanation: string;
   sourceExcerpt?: string;
+  suggestedSources?: SourceSuggestion[];
 }
 
 export interface VerificationResponse {

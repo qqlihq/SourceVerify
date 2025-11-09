@@ -9,6 +9,7 @@ Users can paste AI-generated text with source citations, and SourceVerify will:
 2. Fetch the actual content from cited sources
 3. Use AI to verify whether each claim is actually supported by its source
 4. Provide confidence scores and detailed explanations
+5. Suggest alternative authoritative sources to strengthen, clarify, or correct claims
 
 ## Current State
 The application is fully functional with:
@@ -39,6 +40,7 @@ The application is fully functional with:
   - `claimExtractor.ts` - AI-powered claim extraction
   - `scraper.ts` - Web scraping with SSRF protection
   - `verifier.ts` - AI-powered claim verification
+  - `sourceSuggester.ts` - AI-powered alternative source recommendations
 
 ### Shared (`shared/`)
 - **Type Definitions** (`schema.ts`):
@@ -51,7 +53,8 @@ The application is fully functional with:
 2. **Secure Web Scraping**: Fetches source content with protections against SSRF attacks
 3. **Intelligent Verification**: Uses GPT-5 to compare claims against actual source content
 4. **Detailed Results**: Provides verification status, confidence scores, explanations, and source excerpts
-5. **Batch Processing**: Handles multiple claims efficiently with concurrency limits
+5. **Alternative Source Suggestions**: AI-powered recommendations for authoritative sources to strengthen, clarify, or correct claims based on verification status
+6. **Batch Processing**: Handles multiple claims efficiently with concurrency limits
 
 ## Recent Changes (November 9, 2025)
 - Implemented full backend verification pipeline
@@ -63,6 +66,12 @@ The application is fully functional with:
 - Implemented proper routing with wouter for all pages
 - Fixed accessibility issues with interactive element nesting
 - Added footer navigation across all pages with external GitHub link
+- **NEW**: Implemented AI-powered alternative source suggestions feature
+  - Suggests authoritative sources to strengthen verified claims (confidence < 90%)
+  - Provides clarification sources for partially verified claims
+  - Recommends correction sources for failed verifications
+  - Displays suggestions with descriptions, URLs, and search queries
+  - Contextual messaging based on verification status
 
 ## User Preferences
 - Clean, functional design prioritizing data clarity

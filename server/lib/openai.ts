@@ -7,6 +7,11 @@ const openai = new OpenAI({
   apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY
 });
 
+// Export the OpenAI client for advanced use cases
+export function getOpenAIClient(): OpenAI {
+  return openai;
+}
+
 // Helper function to check if error is rate limit or quota violation
 function isRateLimitError(error: any): boolean {
   const errorMsg = error?.message || String(error);

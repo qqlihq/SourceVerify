@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, Search, Lightbulb } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 import ConfidenceScore from "./ConfidenceScore";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import type { SourceSuggestion } from "@shared/schema";
 
 type VerificationStatus = "verified" | "partial" | "failed";
 
@@ -15,6 +16,7 @@ interface VerificationCardProps {
   confidence: number;
   explanation: string;
   sourceExcerpt?: string;
+  suggestedSources?: SourceSuggestion[];
 }
 
 export default function VerificationCard({
@@ -24,6 +26,7 @@ export default function VerificationCard({
   confidence,
   explanation,
   sourceExcerpt,
+  suggestedSources,
 }: VerificationCardProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -103,6 +106,58 @@ export default function VerificationCard({
                   <p className="text-sm leading-relaxed font-mono" data-testid="text-source-excerpt">
                     {sourceExcerpt}
                   </p>
+                </div>
+              </div>
+            )}
+            {suggestedSources && suggestedSources.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Lightbulb className="w-4 h-4 text-primary" />
+                  <h4 className="text-sm font-semibold">
+                    {status === "verified" 
+                      ? "Additional Sources to Strengthen This Claim"
+                      : status === "partial"
+                      ? "Sources to Clarify This Claim"
+                      : "Sources to Correct This Claim"}
+                  </h4>
+                </div>
+                <div className="space-y-3">
+                  {suggestedSources.map((suggestion, idx) => (
+                    <div key={idx} className="bg-muted/50 border border-border rounded-md p-4 space-y-2" data-testid={`card-suggestion-${idx}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1">
+                          <h5 className="text-sm font-semibold" data-testid="text-suggestion-name">
+                            {suggestion.name}
+                          </h5>
+                          <p className="text-xs text-muted-foreground mt-1" data-testid="text-suggestion-description">
+                            {suggestion.description}
+                          </p>
+                        </div>
+                        {suggestion.url && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            asChild
+                            className="h-auto p-1 flex-shrink-0"
+                            data-testid="button-suggestion-link"
+                          >
+                            <a href={suggestion.url} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </Button>
+                        )}
+                      </div>
+                      {suggestion.searchQuery && (
+                        <div className="flex items-center gap-2 text-xs">
+                          <Search className="w-3 h-3 text-muted-foreground" />
+                          <span className="text-muted-foreground">Search:</span>
+                          <code className="bg-background px-2 py-0.5 rounded text-xs" data-testid="text-search-query">
+                            {suggestion.searchQuery}
+                          </code>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
