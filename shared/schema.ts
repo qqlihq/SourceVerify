@@ -17,6 +17,15 @@ export interface SourceSuggestion {
   searchQuery?: string;
 }
 
+export interface FactCheckResult {
+  source: string;
+  rating?: string;
+  title: string;
+  url: string;
+  date?: string;
+  claimReviewed?: string;
+}
+
 export interface ClaimVerification {
   claim: string;
   sourceUrl: string;
@@ -25,6 +34,7 @@ export interface ClaimVerification {
   explanation: string;
   sourceExcerpt?: string;
   suggestedSources?: SourceSuggestion[];
+  factChecks?: FactCheckResult[];
 }
 
 export interface VerificationResponse {

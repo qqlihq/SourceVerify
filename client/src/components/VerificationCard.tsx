@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp, ExternalLink, Search, Lightbulb } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ChevronDown, ChevronUp, ExternalLink, Search, Lightbulb, ShieldCheck } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 import ConfidenceScore from "./ConfidenceScore";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import type { SourceSuggestion } from "@shared/schema";
+import type { SourceSuggestion, FactCheckResult } from "@shared/schema";
 
 type VerificationStatus = "verified" | "partial" | "failed";
 
@@ -17,6 +18,7 @@ interface VerificationCardProps {
   explanation: string;
   sourceExcerpt?: string;
   suggestedSources?: SourceSuggestion[];
+  factChecks?: FactCheckResult[];
 }
 
 export default function VerificationCard({
@@ -27,6 +29,7 @@ export default function VerificationCard({
   explanation,
   sourceExcerpt,
   suggestedSources,
+  factChecks,
 }: VerificationCardProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -106,6 +109,52 @@ export default function VerificationCard({
                   <p className="text-sm leading-relaxed font-mono" data-testid="text-source-excerpt">
                     {sourceExcerpt}
                   </p>
+                </div>
+              </div>
+            )}
+            {factChecks && factChecks.length > 0 && (
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <ShieldCheck className="w-4 h-4 text-primary" />
+                  <h4 className="text-sm font-semibold">Existing Fact-Checks Found</h4>
+                  <Badge variant="secondary" className="text-xs">{factChecks.length}</Badge>
+                </div>
+                <div className="space-y-2">
+                  {factChecks.map((fc, idx) => (
+                    <a
+                      key={idx}
+                      href={fc.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-start gap-3 p-3 rounded-md bg-muted/50 border border-border hover-elevate"
+                      data-testid={`link-factcheck-${idx}`}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs font-semibold text-muted-foreground" data-testid={`text-factcheck-source-${idx}`}>
+                            {fc.source}
+                          </span>
+                          {fc.rating && (
+                            <Badge variant="outline" className="text-xs" data-testid={`badge-factcheck-rating-${idx}`}>
+                              {fc.rating}
+                            </Badge>
+                          )}
+                          {fc.date && (
+                            <span className="text-xs text-muted-foreground">{fc.date}</span>
+                          )}
+                        </div>
+                        <p className="text-sm mt-1 line-clamp-2" data-testid={`text-factcheck-title-${idx}`}>
+                          {fc.title}
+                        </p>
+                        {fc.claimReviewed && fc.claimReviewed !== fc.title && (
+                          <p className="text-xs text-muted-foreground mt-1 italic line-clamp-1">
+                            Reviewed: {fc.claimReviewed}
+                          </p>
+                        )}
+                      </div>
+                      <ExternalLink className="w-3 h-3 text-muted-foreground flex-shrink-0 mt-1" />
+                    </a>
+                  ))}
                 </div>
               </div>
             )}

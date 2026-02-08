@@ -10,6 +10,7 @@ Users can paste AI-generated text with source citations, and SourceVerify will:
 3. Use AI to verify whether each claim is actually supported by its source
 4. Provide confidence scores and detailed explanations
 5. Suggest alternative authoritative sources to strengthen, clarify, or correct claims
+6. Check fact-checking databases for existing fact-checks on each claim
 
 ## Current State
 The application is fully functional with:
@@ -18,6 +19,7 @@ The application is fully functional with:
 - OpenAI integration for claim extraction and verification (via Replit AI Integrations)
 - Web scraping with security protections (SSRF prevention)
 - Color-coded verification statuses (verified/partial/failed)
+- Fact-check database lookup (30+ fact-checking organizations)
 
 ## Project Architecture
 
@@ -41,11 +43,12 @@ The application is fully functional with:
   - `scraper.ts` - Web scraping with SSRF protection
   - `verifier.ts` - AI-powered claim verification
   - `sourceSuggester.ts` - AI-powered alternative source recommendations
+  - `factChecker.ts` - Fact-check database lookup (Google API + web scraping)
 
 ### Shared (`shared/`)
 - **Type Definitions** (`schema.ts`):
   - Request/response schemas
-  - Verification result types
+  - Verification result types (including FactCheckResult)
   - Zod validation schemas
 
 ## Key Features
@@ -54,7 +57,8 @@ The application is fully functional with:
 3. **Intelligent Verification**: Uses GPT-5 to compare claims against actual source content
 4. **Detailed Results**: Provides verification status, confidence scores, explanations, and source excerpts
 5. **Alternative Source Suggestions**: AI-powered recommendations for authoritative sources to strengthen, clarify, or correct claims based on verification status
-6. **Batch Processing**: Handles multiple claims efficiently with concurrency limits
+6. **Fact-Check Database Lookup**: Searches 30+ fact-checking organizations (Snopes, PolitiFact, Correctiv, AFP, etc.) for existing fact-checks on each claim. Dual approach: Google Fact Check Tools API (when key available) + direct web scraping of fact-check site search pages. Results are AI-ranked for relevance.
+7. **Batch Processing**: Handles multiple claims efficiently with concurrency limits
 
 ## Recent Changes (November 9, 2025)
 - Implemented full backend verification pipeline
@@ -83,6 +87,17 @@ The application is fully functional with:
   - App icons for home screen installation
   - Offline fallback page with friendly messaging
   - Apple iOS meta tags for native-like experience
+
+## Recent Changes (February 8, 2026)
+- **NEW**: Fact-check database lookup feature
+  - Searches 30+ fact-checking organizations for existing fact-checks
+  - Supported sites: Snopes, PolitiFact, FactCheck.org, Full Fact, AFP, Correctiv, EUvsDisinfo, Africa Check, and more
+  - Dual approach: Google Fact Check Tools API (with GOOGLE_FACT_CHECK_API_KEY) + direct web scraping fallback
+  - AI-generated search queries for better matching
+  - AI-ranked results for relevance
+  - Boilerplate link filtering to avoid irrelevant results
+  - Results displayed with source name, rating badge, title, and direct links
+  - Runs in parallel with source suggestions for speed
 
 ## User Preferences
 - Clean, functional design prioritizing data clarity

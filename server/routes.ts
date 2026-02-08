@@ -5,6 +5,7 @@ import { extractClaims } from "./lib/claimExtractor";
 import { fetchMultipleSources } from "./lib/scraper";
 import { verifyClaim } from "./lib/verifier";
 import { suggestAlternativeSources } from "./lib/sourceSuggester";
+import { lookupFactChecks } from "./lib/factChecker";
 import pLimit from "p-limit";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -71,45 +72,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const verifications = await Promise.all(verificationPromises);
 
-      // Step 4: Generate source suggestions for each verification
-      console.log("Generating alternative source suggestions...");
-      const suggestionLimit = pLimit(2); // Process 2 suggestion requests concurrently
+      // Step 4: Generate source suggestions and look up fact-checks in parallel
+      console.log("Generating alternative source suggestions and checking fact-check databases...");
+      const suggestionLimit = pLimit(2);
+      const factCheckLimit = pLimit(2);
       
-      const verificationsWithSuggestions = await Promise.all(
-        verifications.map(verification =>
-          suggestionLimit(async () => {
-            // Only suggest sources for claims that need them (partial or failed)
-            // Also suggest for verified claims with lower confidence
-            const needsSuggestions = 
-              verification.status === "failed" ||
-              verification.status === "partial" ||
-              (verification.status === "verified" && verification.confidence < 90);
-            
-            if (needsSuggestions) {
-              const suggestions = await suggestAlternativeSources(
-                verification.claim,
-                verification.status,
-                verification.confidence
-              );
-              return { ...verification, suggestedSources: suggestions };
-            }
-            return verification;
-          })
-        )
+      const enrichedVerifications = await Promise.all(
+        verifications.map(async (verification) => {
+          const needsSuggestions = 
+            verification.status === "failed" ||
+            verification.status === "partial" ||
+            (verification.status === "verified" && verification.confidence < 90);
+
+          const [suggestions, factChecks] = await Promise.all([
+            needsSuggestions
+              ? suggestionLimit(() =>
+                  suggestAlternativeSources(
+                    verification.claim,
+                    verification.status,
+                    verification.confidence
+                  )
+                )
+              : Promise.resolve(undefined),
+            factCheckLimit(() => lookupFactChecks(verification.claim)),
+          ]);
+
+          return {
+            ...verification,
+            ...(suggestions ? { suggestedSources: suggestions } : {}),
+            ...(factChecks && factChecks.length > 0 ? { factChecks } : {}),
+          };
+        })
       );
 
       // Calculate summary statistics
       const summary = {
-        totalClaims: verificationsWithSuggestions.length,
-        verified: verificationsWithSuggestions.filter(v => v.status === "verified").length,
-        partial: verificationsWithSuggestions.filter(v => v.status === "partial").length,
-        failed: verificationsWithSuggestions.filter(v => v.status === "failed").length,
+        totalClaims: enrichedVerifications.length,
+        verified: enrichedVerifications.filter(v => v.status === "verified").length,
+        partial: enrichedVerifications.filter(v => v.status === "partial").length,
+        failed: enrichedVerifications.filter(v => v.status === "failed").length,
       };
 
       console.log(`Verification complete: ${summary.verified} verified, ${summary.partial} partial, ${summary.failed} failed`);
 
       const response: VerificationResponse = {
-        verifications: verificationsWithSuggestions,
+        verifications: enrichedVerifications,
         summary,
       };
 
