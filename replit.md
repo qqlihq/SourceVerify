@@ -72,6 +72,17 @@ The application is fully functional with:
   - Recommends correction sources for failed verifications
   - Displays suggestions with descriptions, URLs, and search queries
   - Contextual messaging based on verification status
+- **NEW**: Improved web scraper resilience against 403 blocks
+  - Rotating modern browser User-Agent strings
+  - Full browser-like headers (Accept, Sec-Fetch-*, etc.)
+  - Auto-retry (up to 3 attempts) for 403/429 responses
+  - User-friendly error messages
+- **NEW**: Progressive Web App (PWA) support
+  - Web App Manifest for standalone display (no browser bar)
+  - Service Worker for offline caching of app shell
+  - App icons for home screen installation
+  - Offline fallback page with friendly messaging
+  - Apple iOS meta tags for native-like experience
 
 ## User Preferences
 - Clean, functional design prioritizing data clarity
