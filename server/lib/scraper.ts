@@ -9,6 +9,35 @@ export interface ScrapedContent {
   error?: string;
 }
 
+const USER_AGENTS = [
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.1 Safari/605.1.15",
+];
+
+function getRandomUserAgent(): string {
+  return USER_AGENTS[Math.floor(Math.random() * USER_AGENTS.length)];
+}
+
+function getBrowserHeaders(userAgent: string): Record<string, string> {
+  return {
+    "User-Agent": userAgent,
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Cache-Control": "no-cache",
+    "Pragma": "no-cache",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Upgrade-Insecure-Requests": "1",
+    "DNT": "1",
+  };
+}
+
 // Validate URL to prevent SSRF attacks
 function isUrlSafe(url: string): { safe: boolean; error?: string } {
   try {
@@ -62,62 +91,110 @@ function isUrlSafe(url: string): { safe: boolean; error?: string } {
   }
 }
 
+async function attemptFetch(url: string, headers: Record<string, string>, timeout: number) {
+  return axios.get(url, {
+    timeout,
+    headers,
+    maxRedirects: 5,
+    validateStatus: (status) => status < 500,
+  });
+}
+
+function parseHtml(html: string): { text: string; title: string } {
+  const $ = cheerio.load(html);
+
+  $('script, style, nav, header, footer, iframe, noscript, aside, [role="banner"], [role="navigation"]').remove();
+
+  const title = $('title').text().trim() || $('h1').first().text().trim();
+
+  let text = $('article').text() || $('main').text() || $('[role="main"]').text() || $('body').text();
+
+  text = text
+    .replace(/\s+/g, ' ')
+    .replace(/\n+/g, '\n')
+    .trim();
+
+  const maxLength = 10000;
+  if (text.length > maxLength) {
+    text = text.substring(0, maxLength) + "...";
+  }
+
+  return { text, title };
+}
+
 export async function fetchSourceContent(url: string): Promise<ScrapedContent> {
-  try {
-    // Validate URL for security (prevent SSRF)
-    const validation = isUrlSafe(url);
-    if (!validation.safe) {
-      return {
-        url,
-        text: "",
-        error: validation.error || "URL not allowed",
-      };
-    }
-
-    const response = await axios.get(url, {
-      timeout: 10000,
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-      },
-      maxRedirects: 5,
-    });
-
-    const $ = cheerio.load(response.data);
-
-    // Remove script, style, and other non-content elements
-    $('script, style, nav, header, footer, iframe, noscript').remove();
-
-    // Get title
-    const title = $('title').text().trim() || $('h1').first().text().trim();
-
-    // Extract text from body
-    let text = $('body').text();
-
-    // Clean up whitespace
-    text = text
-      .replace(/\s+/g, ' ')
-      .replace(/\n+/g, '\n')
-      .trim();
-
-    // Limit text length to prevent overwhelming the AI
-    const maxLength = 10000;
-    if (text.length > maxLength) {
-      text = text.substring(0, maxLength) + "...";
-    }
-
-    return {
-      url,
-      text,
-      title,
-    };
-  } catch (error: any) {
-    console.error(`Error fetching ${url}:`, error.message);
+  const validation = isUrlSafe(url);
+  if (!validation.safe) {
     return {
       url,
       text: "",
-      error: error.message || "Failed to fetch content",
+      error: validation.error || "URL not allowed",
     };
   }
+
+  const maxRetries = 3;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const userAgent = getRandomUserAgent();
+      const headers = getBrowserHeaders(userAgent);
+
+      if (attempt > 0) {
+        await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+      }
+
+      const response = await attemptFetch(url, headers, 15000);
+
+      if (response.status === 403 || response.status === 429) {
+        console.warn(`Attempt ${attempt + 1}/${maxRetries}: Got ${response.status} for ${url}`);
+        if (attempt < maxRetries - 1) continue;
+        return {
+          url,
+          text: "",
+          error: `Source blocked access (HTTP ${response.status}). The website may restrict automated access.`,
+        };
+      }
+
+      if (response.status >= 400) {
+        return {
+          url,
+          text: "",
+          error: `Source returned HTTP ${response.status}`,
+        };
+      }
+
+      const { text, title } = parseHtml(response.data);
+
+      if (!text || text.length < 50) {
+        return {
+          url,
+          text: text || "",
+          title,
+          error: "Source page contained very little readable text",
+        };
+      }
+
+      return { url, text, title };
+    } catch (error: any) {
+      console.error(`Attempt ${attempt + 1}/${maxRetries} error fetching ${url}:`, error.message);
+      if (attempt < maxRetries - 1) continue;
+
+      let errorMessage = "Failed to fetch content";
+      if (error.code === "ECONNABORTED" || error.message?.includes("timeout")) {
+        errorMessage = "Source took too long to respond";
+      } else if (error.code === "ENOTFOUND") {
+        errorMessage = "Source website not found";
+      } else if (error.code === "ECONNREFUSED") {
+        errorMessage = "Source refused the connection";
+      } else if (error.message) {
+        errorMessage = `Unable to fetch source content: ${error.message}`;
+      }
+
+      return { url, text: "", error: errorMessage };
+    }
+  }
+
+  return { url, text: "", error: "Failed to fetch content after multiple attempts" };
 }
 
 export async function fetchMultipleSources(urls: string[]): Promise<ScrapedContent[]> {

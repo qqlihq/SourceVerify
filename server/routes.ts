@@ -55,13 +55,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const verificationPromises = claims.map(claim =>
         limit(async () => {
           const sourceContent = sourceMap.get(claim.sourceUrl);
-          if (!sourceContent) {
+          if (!sourceContent || sourceContent.error) {
+            const errorDetail = sourceContent?.error || "Source content could not be retrieved";
             return {
               claim: claim.claim,
               sourceUrl: claim.sourceUrl,
               status: "failed" as const,
               confidence: 0,
-              explanation: "Source content not found",
+              explanation: errorDetail,
             };
           }
           return await verifyClaim(claim.claim, sourceContent);
